@@ -1,0 +1,4 @@
+# VSCode
+.vscode
+*.code-project
+*.code-workspace
