@@ -1,9 +1,7 @@
 package switcher
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path"
 
@@ -13,21 +11,8 @@ import (
 // BraveData reads the profiles.json file in our local Brave directory
 // Returns as map
 func BraveData() (map[string]interface{}, error) {
-	var data = make(map[string]interface{})
-
 	fp := braveConfigFilepath()
-	if !exists(fp) {
-		return data, fmt.Errorf("brave home directory %s not found", fp)
-	}
-	buf, err := os.ReadFile(fp)
-	if err != nil {
-		return data, fmt.Errorf("error reading file: %w", err)
-	}
-	err = json.Unmarshal(buf, &data)
-	if err != nil {
-		return data, fmt.Errorf("error loading JSON data: %w", err)
-	}
-	return data, nil
+	return ReadJSONFile(fp)
 }
 
 // ProfileData returns slice of raw profile data maps
@@ -38,15 +23,6 @@ func ProfileData(data map[string]interface{}) (interface{}, error) {
 		return res, fmt.Errorf("error reading profile data: %s", err.Error())
 	}
 	return res, nil
-}
-
-// PrintJSON returns JSON 2 pretty-printed
-func PrintJSON(data map[string]interface{}) string {
-	strData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		log.Fatal("failed to parse JSON data: %w", err)
-	}
-	return string(strData)
 }
 
 // exists checks a filepath exists
