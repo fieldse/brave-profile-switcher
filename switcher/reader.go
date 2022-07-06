@@ -6,15 +6,14 @@ import (
 	"log"
 	"os"
 	"path"
-)
 
-// jsonMap represents basic json data structure as a map
-type jsonMap map[string]interface{}
+	"github.com/mnogu/go-dig"
+)
 
 // BraveData reads the profiles.json file in our local Brave directory
 // Returns as map
-func BraveData() (jsonMap, error) {
-	var data = make(jsonMap)
+func BraveData() (map[string]interface{}, error) {
+	var data = make(map[string]interface{})
 
 	fp := braveConfigFilepath()
 	if !exists(fp) {
@@ -31,8 +30,18 @@ func BraveData() (jsonMap, error) {
 	return data, nil
 }
 
+// ProfileData returns slice of raw profile data maps
+func ProfileData(data map[string]interface{}) (interface{}, error) {
+	var res interface{}
+	res, err := dig.Dig(data, "profile", "info_cache")
+	if err != nil {
+		return res, fmt.Errorf("error reading profile data: %s", err.Error())
+	}
+	return res, nil
+}
+
 // PrintJSON returns JSON 2 pretty-printed
-func PrintJSON(data jsonMap) string {
+func PrintJSON(data map[string]interface{}) string {
 	strData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		log.Fatal("failed to parse JSON data: %w", err)
