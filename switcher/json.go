@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
+
+	"github.com/fieldse/brave-profile-switcher/internal/logger"
 )
 
 // PrintJSON returns pretty-printed JSON with 2-space indentation
-func PrintJSON(data map[string]interface{}) string {
+func PrintJSON(data interface{}) string {
 	strData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		log.Fatal("failed to parse JSON data: %w", err)
@@ -31,4 +34,14 @@ func ReadJSONFile(fp string) (map[string]interface{}, error) {
 		return data, fmt.Errorf("error loading JSON data: %w", err)
 	}
 	return data, nil
+}
+
+// PrintKeys prints the keys from a JSON map
+func PrintKeys(data interface{}) {
+	keys := reflect.ValueOf(data).MapKeys()
+
+	logger.Info("keys", "\n")
+	for i, k := range keys {
+		fmt.Printf("  %d -- %s\n", i+1, k)
+	}
 }

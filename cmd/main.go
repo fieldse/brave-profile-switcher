@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
+	"github.com/fieldse/brave-profile-switcher/internal/logger"
 	"github.com/fieldse/brave-profile-switcher/switcher"
 )
 
@@ -17,7 +17,8 @@ func main() {
 	if err != nil {
 		fail("failed to read profile data", err)
 	}
-	fmt.Print("profile data: ", res)
+	strData := switcher.PrintJSON(res)
+	logger.Info("profile data", strData)
 }
 
 func fail(msg string, err error) {
