@@ -2,12 +2,10 @@ package switcher
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path"
 
 	"github.com/fieldse/brave-profile-switcher/internal/logger"
-	"github.com/mnogu/go-dig"
 )
 
 // BraveData represents a portion of the Brave settings JSON, which we need
@@ -27,34 +25,30 @@ type BraveProfile struct {
 }
 
 // ReadBraveData reads the profiles.json file in our local Brave directory
-// Returns as map
-func ReadBraveData() (map[string]interface{}, error) {
+// Returns as BraveData struct
+func ReadBraveData() (BraveData, error) {
+	var b BraveData
 	fp := braveConfigFilepath()
-	return ReadJSONFile(fp)
+	buf, err := ReadToBytes(fp)
+	if err != nil {
+		logger.Error(err, "read brave data")
+		return b, err
+	}
+	return parseToStruct(buf)
 }
 
 // parseToStruct will try to parse json file data to a BraveData struct
-func parseToStruct(buf []byte) (BraveData, error) {
+func parseToStruct(data []byte) (BraveData, error) {
 	var b1 BraveData
 
 	// Attempt to unmarshal
-	err := json.Unmarshal(buf, &b1)
+	err := json.Unmarshal(data, &b1)
 	if err != nil {
 		logger.Error(err, "unmarshal JSON data")
 		return b1, err
 	}
-	logger.Success("parse json data", "data: %s", PrintJSON(b1))
+	logger.Success("parse json data", "")
 	return b1, nil
-}
-
-// ProfileData returns slice of raw profile data maps
-func ProfileData(data map[string]interface{}) (interface{}, error) {
-	var res interface{}
-	res, err := dig.Dig(data, "profile", "info_cache")
-	if err != nil {
-		return res, fmt.Errorf("error reading profile data: %s", err.Error())
-	}
-	return res, nil
 }
 
 // exists checks a filepath exists

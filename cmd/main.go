@@ -13,12 +13,7 @@ func main() {
 	if err != nil {
 		fail("failed to read brave data", err)
 	}
-	res, err := switcher.ProfileData(data)
-	if err != nil {
-		fail("failed to read profile data", err)
-	}
-	strData := switcher.PrintJSON(res)
-	logger.Info("profile data", strData)
+	logger.Debug("read brave data", "data: %v", data)
 }
 
 func fail(msg string, err error) {
