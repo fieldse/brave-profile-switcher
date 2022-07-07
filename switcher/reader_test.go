@@ -9,8 +9,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestParseData(t *testing.T) {
+	fp := braveConfigFilepath()
+
+	// Read as raw bytes
+	buf, err := ReadToBytes(fp)
+	assert.Nil(t, err)
+
+	res, err := parseToStruct(buf)
+	assert.Nil(t, err)
+	logger.Debug("parseToStruct", "profile data: %+v", res)
+}
+
 func TestBraveData(t *testing.T) {
-	res, err := BraveData()
+	res, err := ReadBraveData()
 	assert.Nil(t, err)
 
 	// print map keys
@@ -35,7 +47,7 @@ func Test_braveConfigFilepath(t *testing.T) {
 }
 
 func TestProfileData(t *testing.T) {
-	x, err := BraveData()
+	x, err := ReadBraveData()
 	assert.Nil(t, err)
 
 	res, err := ProfileData(x)

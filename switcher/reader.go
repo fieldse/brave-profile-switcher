@@ -1,18 +1,50 @@
 package switcher
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
 
+	"github.com/fieldse/brave-profile-switcher/internal/logger"
 	"github.com/mnogu/go-dig"
 )
 
-// BraveData reads the profiles.json file in our local Brave directory
+// BraveData represents a portion of the Brave settings JSON, which we need
+// to extract the Brave profiles data
+type BraveData struct {
+	Profile struct {
+		// InfoCache map[string]interface{} `json:"info_cache"`
+		InfoCache map[string]BraveProfile `json:"info_cache"`
+	}
+}
+
+type BraveProfile struct {
+	Name                  string `json:"name"` // user-defined profile name
+	AvatarIcon            string `json:"avatar_icon"`
+	ProfileHighlightColor int    `json:""`
+	ProfileDirName        string // brave auto-defined directory name. eg: "Profile 8"
+}
+
+// ReadBraveData reads the profiles.json file in our local Brave directory
 // Returns as map
-func BraveData() (map[string]interface{}, error) {
+func ReadBraveData() (map[string]interface{}, error) {
 	fp := braveConfigFilepath()
 	return ReadJSONFile(fp)
+}
+
+// parseToStruct will try to parse json file data to a BraveData struct
+func parseToStruct(buf []byte) (BraveData, error) {
+	var b1 BraveData
+
+	// Attempt to unmarshal
+	err := json.Unmarshal(buf, &b1)
+	if err != nil {
+		logger.Error(err, "unmarshal JSON data")
+		return b1, err
+	}
+	logger.Success("parse json data", "data: %s", PrintJSON(b1))
+	return b1, nil
 }
 
 // ProfileData returns slice of raw profile data maps
