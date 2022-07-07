@@ -20,14 +20,24 @@ func PrintJSON(data interface{}) string {
 	return string(strData)
 }
 
-func ReadJSONFile(fp string) (map[string]interface{}, error) {
-	var data = make(map[string]interface{})
+// ReadToBytes reads file to bytes
+func ReadToBytes(fp string) (buf []byte, err error) {
 	if !exists(fp) {
-		return data, fmt.Errorf("path %s not found", fp)
+		return buf, fmt.Errorf("path %s not found", fp)
 	}
-	buf, err := os.ReadFile(fp)
+	buf, err = os.ReadFile(fp)
 	if err != nil {
-		return data, fmt.Errorf("error reading file: %w", err)
+		return buf, fmt.Errorf("error reading file: %w", err)
+	}
+	return buf, nil
+}
+
+// ReadJSONFile reads and unmarshals data from a json file to a map
+func ReadJSONFile(fp string) (data map[string]interface{}, err error) {
+	data = make(map[string]interface{})
+	buf, err := ReadToBytes(fp)
+	if err != nil {
+		return data, err
 	}
 	err = json.Unmarshal(buf, &data)
 	if err != nil {

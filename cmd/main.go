@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	data, err := switcher.BraveData()
+	data, err := switcher.ReadBraveData()
 	if err != nil {
 		fail("failed to read brave data", err)
 	}
